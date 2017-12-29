@@ -48,7 +48,8 @@ jQuery(document).ready(function($){
       $('.has-spinner.active').removeClass('active');
     }
   });
-});
+
+}); //end doc ready
 
 //snowflakes
 const NUMBER_OF_FLAKES = 20;
