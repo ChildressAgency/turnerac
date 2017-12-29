@@ -288,3 +288,150 @@ if(function_exists('acf_add_options_page')){
   ));
   */
 }
+
+add_action('init', 'turnerac_create_post_type');
+function turnerac_create_post_type(){
+  $quotes_labels = array(
+    'name' => 'Quotes',
+    'singular_name' => 'Quote',
+    'menu_name' => 'Quotes',
+    'add_new_item' => 'Add New Quote',
+    'search_items' => 'Search Quotes'
+  );
+  $quotes_args = array(
+    'labels' => $quotes_labels,
+    'public' => true,
+    'menu_position' => 5,
+    'supports' => array('title', 'author', 'revisions'),
+    'menu_icon' => 'dashicons-media-spreadsheet'
+  );
+  register_post_type('quotes', $quotes_args);
+
+  $parts_labels = array(
+    'name' => 'Parts',
+    'singular_name' => 'Part',
+    'menu_name' => 'Parts',
+    'add_new_item' => 'Add New Part',
+    'search_items' => 'Search Parts'
+  );
+  $parts_args = array(
+    'labels' => $parts_labels,
+    'public' => true,
+    'menu_position' => 6,
+    'supports' => array('title', 'author'),
+    'taxonomies' => array('part_category'),
+    'menu_icon' => 'dashicons-hammer'
+  );
+  register_post_type('parts', $parts_args);
+  register_taxonomy('part_category',
+    'parts',
+    array(
+      'hierarchical' => true,
+      'labels' => array(
+        'name' => 'Parts Categories',
+        'singular_name' => 'Parts Category'
+      )
+    )
+  );
+}
+
+add_action('restrict_manage_posts', 'turnerac_filter_parts_by_taxonomy');
+function turnerac_filter_parts_by_taxonomy(){
+  global $typenow;
+  $post_type = 'parts';
+  $taxonomy = 'part_category';
+
+  if($typenow == $post_type){
+    $selected = isset($_GET[$taxonomy]) ? $_GET[$taxonomy] : '';
+    $info_taxonomy = get_taxonomy($taxonomy);
+    wp_dropdown_categories(array(
+      'show_option_all' => __("Show All {$info_taxonomy->label}"),
+      'taxonomy' => $taxonomy,
+      'name' => $taxonomy,
+      'orderby' => 'name',
+      'selected' => $selected,
+      'show_count' => true,
+      'hide_empty' => false,
+    ));
+  }
+}
+
+add_filter('parse_query', 'turnerac_convert_part_id_to_term_in_query');
+function turnerac_convert_part_id_to_term_in_query($query){
+  global $pagenow;
+  $post_type = 'parts';
+  $taxonomy = 'part_category';
+  $q_vars = &$query->query_vars;
+
+  if($pagenow == 'edit.php'
+      && isset($q_vars['post_type'])
+      && $q_vars['post_type'] == $post_type
+      && isset($q_vars[$taxonomy])
+      && is_numeric($q_vars[$taxonomy])
+      && $q_vars[$taxonomy] != 0){
+    
+    $term = get_term_by('id', $q_vars[$taxonomy], $taxonomy);
+    $q_vars[$taxonomy] = $term->slug;
+  }
+}
+
+add_filter('manage_edit-parts_columns', 'turnerac_edit_parts_columns');
+function turnerac_edit_parts_columns($column){
+  $columns = array(
+    'cb' => '<input type="checkbox" />',
+    'title' => __('Part'),
+    'price' => __('Price'),
+    'categories' => __('Part Category'),
+    'date' => __('Date')
+  );
+  return $columns;
+}
+add_action('manage_parts_posts_custom_column', 'turnerac_manage_parts_columns', 10, 2);
+function turnerac_manage_parts_columns($column, $post_id){
+  if($column == 'price'){
+    echo get_field('price');
+  }
+}
+
+add_filter('enter_title_here', 'turnerac_custom_title_placeholders');
+function turnerac_custom_title_placeholders($title){
+  $screen = get_current_screen();
+
+  if($screen->post_type == 'quotes'){
+    $title = 'Customer Name';
+  }
+  elseif($screen->post_type == 'parts'){
+    $title = 'Part Name';
+  }
+
+  return $title;
+}
+
+//product field key: field_5a450e14bf14f
+add_filter('acf/load_field/key=field_5a450e14bf14f', 'turnerac_load_products_select');
+function turnerac_load_products_select($field){
+  //reset choices
+  $field['choices'] = array();
+
+  //get product taxonomies
+  $product_cats = get_terms(array(
+    'taxonomy' => 'part_category',
+    'hide_empty' => false
+  ));
+
+  //create array of products (product_types)
+  foreach($product_cats as $product_type){
+    $product_types[$product_type->slug] = $product_type->name;
+  }
+
+  //sort product types alphabetically
+  natsort($product_types);
+
+  //populate select field
+  foreach($product_types as $key => $value){
+    $field['value'] = $key;
+    $field['choices'][$key] = $value;
+  }
+
+  return $field;
+}
