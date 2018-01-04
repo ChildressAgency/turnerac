@@ -484,8 +484,26 @@ function turnerac_add_parts($selected_part_type){
 
   $selected_part_type = $_POST['part_type'];
 
-  $parts_types = array('test1', 'test2', 'test3');
-  return wp_send_json($parts_types);
+  $parts_query = new WP_Query(array(
+    'post_type' => 'parts',
+    'tax_query' => array(
+      array(
+        'taxonomy' => 'part_category',
+        'field' => 'slug',
+        'terms' => $selected_part_type
+      ),
+    )
+  ));
+
+  $parts = array();
+  if($parts_query->have_posts()){
+    while($parts_query->have_posts()){
+      $parts_query->the_post();
+      $parts[get_the_ID()] = get_the_title();
+    }
+  }
+
+  return wp_send_json($parts);
 
   wp_die();
 }

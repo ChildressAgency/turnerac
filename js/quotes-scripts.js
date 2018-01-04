@@ -26,7 +26,7 @@ jQuery(document).ready(function($){
           partSelectField.html('<option value="0" selected disabled>Choose One</option>');
 
           $.each(response, function(val, text){
-            partSelectField.append($('<option></option>').val(text).html(text));
+            partSelectField.append($('<option></option>').val(val).html(text));
             partSelectField.prop('disabled', false);
           });
         }
