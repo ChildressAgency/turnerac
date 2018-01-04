@@ -349,6 +349,7 @@ function turnerac_create_post_type(){
     'parts',
     array(
       'hierarchical' => true,
+      'show_admin_column' => true,
       'labels' => array(
         'name' => 'Parts Categories',
         'singular_name' => 'Parts Category'
@@ -403,7 +404,7 @@ function turnerac_edit_parts_columns($column){
     'cb' => '<input type="checkbox" />',
     'title' => __('Part'),
     'price' => __('Price'),
-    'categories' => __('Part Category'),
+    'part_category' => __('Part Category'),
     'date' => __('Date')
   );
   return $columns;
@@ -412,6 +413,9 @@ add_action('manage_parts_posts_custom_column', 'turnerac_manage_parts_columns', 
 function turnerac_manage_parts_columns($column, $post_id){
   if($column == 'price'){
     echo get_field('price');
+  }
+  elseif($column == 'part_category'){
+    echo 'test';
   }
 }
 
@@ -429,31 +433,47 @@ function turnerac_custom_title_placeholders($title){
   return $title;
 }
 
-//product field key: field_5a450e14bf14f
-add_filter('acf/load_field/key=field_5a450e14bf14f', 'turnerac_load_products_select');
-function turnerac_load_products_select($field){
+//part type field key: field_5a450e14bf14f
+add_filter('acf/load_field/key=field_5a450e14bf14f', 'turnerac_load_part_type_select');
+function turnerac_load_part_type_select($field){
   //reset choices
   $field['choices'] = array();
 
-  //get product taxonomies
-  $product_cats = get_terms(array(
+  //get part taxonomies
+  $part_cats = get_terms(array(
     'taxonomy' => 'part_category',
     'hide_empty' => false
   ));
 
-  //create array of products (product_types)
-  foreach($product_cats as $product_type){
-    $product_types[$product_type->slug] = $product_type->name;
+  //create array of parts (part_types)
+  foreach($part_cats as $part_type){
+    $part_types[$part_type->slug] = $part_type->name;
   }
 
-  //sort product types alphabetically
-  natsort($product_types);
+  //sort part types alphabetically
+  natsort($part_types);
 
   //populate select field
-  foreach($product_types as $key => $value){
+  foreach($part_types as $key => $value){
     $field['value'] = $key;
     $field['choices'][$key] = $value;
   }
 
   return $field;
+}
+
+add_action('wp_ajax_qs_add_parts', 'turnerac_add_parts');
+add_action('wp_ajax_nopriv_qs_add_parts', 'turnerac_add_parts');
+function turnerac_add_parts($selected_part_type){
+  //verify nonce
+  if(!isset($_POST['qs_nonce']) || !wp_verify_nonce($_POST['qs_nonce'], 'qs_nonce')){
+    wp_die('Permission denied');
+  }
+
+  $selected_part_type = $_POST['part_type'];
+
+  $parts_types = array('test1', 'test2', 'test3');
+  return wp_send_json($parts_types);
+
+  wp_die();
 }
