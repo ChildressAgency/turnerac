@@ -409,13 +409,25 @@ function turnerac_edit_parts_columns($column){
   );
   return $columns;
 }
+
 add_action('manage_parts_posts_custom_column', 'turnerac_manage_parts_columns', 10, 2);
 function turnerac_manage_parts_columns($column, $post_id){
   if($column == 'price'){
     echo get_field('price');
   }
   elseif($column == 'part_category'){
-    echo 'test';
+    $terms = get_the_terms($post_id, 'part_category');
+
+    if($terms && !is_wp_error($terms)){
+      $term_list = array();
+
+      foreach($terms as $term){
+        $term_list[] = $term->name;
+      }
+
+      $part_categories = implode(', ', $term_list);
+      echo $part_categories;
+    }
   }
 }
 
