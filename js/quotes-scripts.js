@@ -2,35 +2,44 @@ jQuery(document).ready(function($){
   var partTypeSelect = $('.turnerac-part-type select');
   var partSelect = $('.turnerac-part-selector select');
 
-  //add default option
-  partTypeSelect.prepend('<option value="0" selected>Choose One</option>');
-  partSelect.prop('disabled', true);
-
   $('.acf-table tbody').on('change', '.turnerac-part-type', function(){
     var selectedPartType = $('option:checked', this).val();
-    //console.log(selectedPartType);
-    var rowId = $(this).parent().attr('data-id');
+    var partTypeSelectID = $('option:checked', this).parent().attr('id');
+    var partTypeSelectIDa = partTypeSelectID.split('-');
+    //var rowId = partTypeSelectIDa[2];
+    partTypeSelectIDa.pop();
+    partTypeSelectIDa.push('field_5a53ac2c87acf');
+
+    var partSelectFieldID = partTypeSelectIDa.join("-");
 
     if(selectedPartType != 0){
-      data = { 
-        action: 'qs_add_parts',
+      data = {
+        action: 'qs_filter_parts', 
         qs_nonce: qs_vars.qs_nonce,
         part_type: selectedPartType
       };
 
       $.post(ajaxurl, data, function(response){
         if(response){
-          var partSelectField = $('[data-id="' + rowId + '"] .turnerac-part-selector select');
-
-          //disabled select part until part type is selected
-          partSelectField.html('<option value="0" selected disabled>Choose One</option>');
-
-          $.each(response, function(val, text){
-            partSelectField.append($('<option></option>').val(val).html(text));
-            partSelectField.prop('disabled', false);
-          });
+          $('#' + partSelectFieldID).html(response);
         }
       });
+    }
+
+  });
+
+  $('.acf-table tbody').on('change', '.turnerac-part-selector', function(){
+    var selectedPart = $('option:checked', this);
+    var selectedPartPrice = selectedPart.data('price');
+
+    var partSelectID = $('option:checked', this).parent().attr('id');
+    var partSelectIDa = partSelectID.split('-');
+    partSelectIDa.pop();
+    partSelectIDa.push('field_5a53ac2c8b965');
+
+    var priceFieldID = partSelectIDa.join('-');
+    if(selectedPartPrice){
+      $('#' + priceFieldID).val(selectedPartPrice);
     }
   });
 });

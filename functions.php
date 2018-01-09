@@ -445,30 +445,29 @@ function turnerac_custom_title_placeholders($title){
   return $title;
 }
 
-//part type field key: field_5a450e14bf14f
-add_filter('acf/load_field/key=field_5a450e14bf14f', 'turnerac_load_part_type_select');
-function turnerac_load_part_type_select($field){
-  //reset choices
+//part field key: field_5a46795b00fbb
+add_filter('acf/load_field/key=field_5a53ac2c87acf', 'turnerac_load_part_select');
+function turnerac_load_part_select($field){
+
   $field['choices'] = array();
 
-  //get part taxonomies
-  $part_cats = get_terms(array(
-    'taxonomy' => 'part_category',
-    'hide_empty' => false
+  $part_list = new WP_Query(array(
+    'post_type' => 'parts',
+    'posts_per_page' => -1,
+    'orderby' => 'name'
   ));
+  //var_dump($part_list);
 
-  //create array of parts (part_types)
-  foreach($part_cats as $part_type){
-    $part_types[$part_type->slug] = $part_type->name;
-  }
+  if($part_list->have_posts()){
+    while($part_list->have_posts()){
+      $part_list->the_post();
+      $part_id = get_the_ID();
+      $post_title = get_post_field('post_name', $part_id);
+      $post_name = get_post_field('post_title', $part_id);
 
-  //sort part types alphabetically
-  natsort($part_types);
-
-  //populate select field
-  foreach($part_types as $key => $value){
-    $field['value'] = $key;
-    $field['choices'][$key] = $value;
+      $field['value'] = $post_title;
+      $field['choices'][$post_title] = $post_name;
+    }
   }
 
   return $field;
@@ -499,11 +498,55 @@ function turnerac_add_parts($selected_part_type){
   if($parts_query->have_posts()){
     while($parts_query->have_posts()){
       $parts_query->the_post();
-      $parts[get_the_ID()] = get_the_title();
+      //$parts[get_the_ID()] = get_the_title();
+      $parts[get_the_ID()]['part_name'][get_the_title()];
+      $parts[get_the_ID()]['price'][get_field('price')];
+      $parts[get_the_ID()]['image_url'][get_field('picture')];
+
+      $parts[get_the_ID()] = array(
+        'part_name' => get_the_title(),
+        'price' => get_field('price'),
+        'image_url' => get_field('picture')
+      );
     }
   }
 
   return wp_send_json($parts);
 
+  wp_die();
+}
+
+add_action('wp_ajax_qs_filter_parts', 'turnerac_filter_parts');
+add_action('wp_ajax_nopriv_qs_filter_parts', 'turnerac_filter_parts');
+function turnerac_filter_parts(){
+  //verify nonce
+  if(!isset($_POST['qs_nonce']) || !wp_verify_nonce($_POST['qs_nonce'], 'qs_nonce')){
+    wp_die('Permission denied');
+  }
+
+  $selected_part_type = $_POST['part_type'];
+
+  $parts_query = new WP_Query(array(
+    'post_type' => 'parts',
+    'tax_query' => array(
+      array(
+        'taxonomy' => 'part_category',
+        'field' => 'term_id',
+        'terms' => $selected_part_type
+      ),
+    )
+  ));
+
+  $parts = '<option value selected="selected" data-i="0" class> - Select -</option>';
+  if($parts_query->have_posts()){
+    while($parts_query->have_posts()){
+      $parts_query->the_post();
+      $part_price = get_field('price');
+
+      $parts .= '<option value="' . get_post_field('post_name', $part_id) . '" data-price="' . $part_price . '">' . get_post_field('post_title', $part_id) . '</option>';
+    }
+  }
+
+  echo $parts;
   wp_die();
 }
