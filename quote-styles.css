@@ -1,0 +1,19 @@
+
+#bodyTable{
+  width:536pt;
+  margin-left:auto;
+  margin-right:auto;
+  border:1px solid #000;
+  font-family:sans-serif;
+}
+img{
+  display:block;
+  max-width:100%;
+}
+table td{
+  border:1px solid #000;
+}
+
+.bg-highlight{
+  background-color:#25ace1;
+}
