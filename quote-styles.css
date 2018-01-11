@@ -16,7 +16,7 @@ table td{
 }
 
 .bg-highlight{
-  background-color:#25ace1;
+  background-color:#25ace1 !important;
 }
 #installItems td{
   padding:0px 2px;
