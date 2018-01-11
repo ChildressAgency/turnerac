@@ -25,9 +25,10 @@ function turnerac_scripts(){
     true
   );
   
-  
-  wp_enqueue_script('bootstrap-script');
-  wp_enqueue_script('turnerac-scripts');  
+  if(!is_singular('quotes')){
+    wp_enqueue_script('bootstrap-script');
+    wp_enqueue_script('turnerac-scripts');  
+  }
 }
 
 add_action('wp_enqueue_scripts', 'turnerac_styles');
@@ -36,9 +37,11 @@ function turnerac_styles(){
   wp_register_style('turnerac', get_template_directory_uri() . '/style.css');
   wp_register_style('animate-css', get_template_directory_uri() . '/css/animate.min.css');
   
-  wp_enqueue_style('bootstrap-css');
-  wp_enqueue_style('animate-css');
-  wp_enqueue_style('turnerac');
+  if(!is_singular('quotes')){
+    wp_enqueue_style('bootstrap-css');
+    wp_enqueue_style('animate-css');
+    wp_enqueue_style('turnerac');
+  }
 }
 
 add_action('admin_enqueue_scripts', 'turnerac_admin_script');
