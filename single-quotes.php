@@ -56,7 +56,7 @@
     </style>
   </head>
 
-  <body>
+  <body <?php body_class(); ?>>
     <table id="bodyTable" cellpadding="0" cellspacing="0">
       <tr>
         <td>
@@ -144,8 +144,8 @@
                               </tr>
                             </table>
                           </td>
-                          <td style="width:33.3%;"><?php echo get_field('installation_street_address') ? get_field('installation_street_address') : '&nbsp;'; ?></td>
-                          <td style="width:33.3%;"><?php echo get_field('installation_city_state_zip') ? get_field('installation_city_state_zip') : '&nbsp;'; ?></td>
+                          <td style="width:33.3%;"><?php echo get_field('installation_street_address') ? get_field('installation_street_address') : '&nbsp;'; ?><br /><?php echo get_field('installation_city_state_zip') ? get_field('installation_city_state_zip') : '&nbsp;'; ?></td>
+                          <td style="width:33.3%;"><?php echo get_field('email') ? get_field('email') : '&nbsp;'; ?></td>
                         </tr>
                       </table>
                     </td>
@@ -162,13 +162,20 @@
                           <th style="width:40%; border:1px solid #000;">Note/Description</th>
                         </tr>
                         <!-- installation items loop -->
-                        <?php $subtotal = ''; if(have_rows('items')): while(have_rows('items')): the_row(); ?>
-                          <tr>
-                            <td><?php echo get_sub_field('part') ? get_sub_field('part') ? '&nbsp;'; ?></td>
-                            <td><?php echo get_sub_field('new_existing_na') ? get_sub_field('new_existing_na') : '&nbsp;'; ?></td>
-                            <td><?php echo get_sub_field('note_description') ? get_sub_field('note_description') ? '&nbsp;'; ?></td>
-                          </tr>
-                        <?php $subtotal += get_sub_field('price'); endwhile; endif; ?>
+                        <?php
+                          $items = get_field('item');
+                          if($items){
+                            foreach($items as $item){
+                              echo '<tr><td>' . ($item['part'] ? $item['part'] : '&nbsp;') . '</td>';
+                              echo '<td>' . ($item['new_existing_na'] ? $item['new_existing_na'] : '&nbsp;') . '</td>';
+                              echo '<td>' . ($item['note_description'] ? $item['note_description'] : '&nbsp;') . '</td></tr>';
+                              $item_price = get_sub_field('price');
+                              if(is_numeric($item_price)){
+                                $subtotal += $item_price; 
+                              }
+                            }
+                          }
+                        ?>
                         <!-- end installation items loop -->
                       </table>
                     </td>
@@ -197,7 +204,7 @@
                               <?php if(have_rows('warranties')): while(have_rows('warranties')) : the_row(); ?>
                                 <tr>
                                   <td style="width:25%;"><?php echo get_sub_field('warranty_term') ? get_sub_field('warranty_term') : '&nbsp;'; ?></td>
-                                  <td style="width:75%;"><?php echo get_sub_field('warranty_details') ? get_sub_field('warranty_details'); ?></td>
+                                  <td style="width:75%;"><?php echo get_sub_field('warranty_details') ? get_sub_field('warranty_details') : '&nbsp;'; ?></td>
                                 </tr>
                               <?php endwhile; endif; ?>
                             </table>
@@ -212,7 +219,7 @@
                       <table id="subtotal" cellpadding="0" cellspacing="0" style="width:100%;">
                         <tr>
                           <td style="width:75%; padding:0px 2px; font-size:12px; font-weight:bold;">The above work will be performed for the sum of:</td>
-                          <td style="width:25%; padding:0px 2px;"><?php echo $subtotal ? $subtotal : '&nbsp;'; ?></td>
+                          <td style="width:25%; padding:0px 2px;"><?php var_dump($subtotal); //echo $subtotal ? $subtotal : '&nbsp;'; ?></td>
                         </tr>
                       </table>
                     </td>
@@ -228,7 +235,12 @@
                             <td class="bg-highlight" style="width:75%; padding:0px 2px;"><span style="font-weight:bold;"><?php if($i==0){ echo 'Options: '; } ?><?php echo the_sub_field('option'); ?></span></td>
                             <td style="width:25%;"><?php the_sub_field('option_price'); ?></td>
                           </tr>
-                        <?php $grandtotal += get_sub_field('option_price'); $i++; endwhile; endif; ?>
+                        <?php 
+                          $option_price = get_sub_field('option_price');
+                          if(is_numeric($option_price)){
+                            $grandtotal += $option_price;
+                          }  
+                          $i++; endwhile; endif; ?>
                       </table>
                     </td>
                   </tr>

@@ -531,6 +531,7 @@ function turnerac_filter_parts(){
 
   $parts_query = new WP_Query(array(
     'post_type' => 'parts',
+    'posts_per_page' => -1,
     'tax_query' => array(
       array(
         'taxonomy' => 'part_category',
