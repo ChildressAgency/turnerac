@@ -163,7 +163,7 @@
                           <th style="width:40%; border:1px solid #000;">Note/Description</th>
                         </tr>
                         <!-- installation items loop -->
-                        <?php
+                        <?php /*
                           $subtotal = 0;
                           $items = get_field('item', $quote_id);
                           if($items){
@@ -176,8 +176,27 @@
                                 $subtotal += $item_price; 
                               }
                             }
-                          }
+                          }*/
                         ?>
+
+                        <?php
+                          $subtotal = 0;
+                          if(have_rows('item', $quote_id)): while(have_rows('item', $quote_id)): the_row(); 
+                            $selected_part_field = get_sub_field_object('part');
+                            $selected_part = $selected_part_field['value'];
+                            $selected_part_slug = $selected_part_field['choices'][$selected_part]; ?>
+                            <tr>
+                              <td style="font-style:italic;"><?php echo $selected_part ? $selected_part_slug : '&nbsp;'; ?></td>
+                              <td><?php echo get_sub_field('new_existing_na') ? get_sub_field('new_existing_na') : '&nbsp;'; ?></td>
+                              <td><?php echo get_sub_field('note_description') ? get_sub_field('note_description') : '&nbsp;'; ?></td>
+                            </tr>
+                        <?php 
+                          $item_price = get_sub_field('price');
+                          if(is_numeric($item_price)){
+                            $subtotal += $item_price;
+                          }
+
+                          endwhile; endif; ?>
                         <!-- end installation items loop -->
                       </table>
                     </td>
@@ -287,38 +306,39 @@
                   </tr>
                 </table>
               </td>
-              <td id="sidebar" style="width:25%;">
+              <td id="sidebar" valign="tope" style="width:25%; vertical-align:top;">
                 <table id="productImages" cellpadding="0" cellspacing="0" style="width:100%;">
-                  <?php 
-                    $items = get_field('item', $quote_id);
-                    if($items){
-                      foreach($items as $item){
-                        $selected_part = $item['part'];
-                        $selected_part_slug = $selected_part['value'];
+                  <?php if(have_rows('item', $quote_id)): while(have_rows('item', $quote_id)): the_row(); ?>
+                    <?php 
+                      $selected_part_field = get_sub_field_object('part');
+                      $selected_part = $selected_part_field['value'];
+                      //$selected_part_slug = $selected_part_field['choices'][$selected_part];
 
-                        $part = new WP_Query(array(
-                          'post_type' => 'parts',
-                          'pagename' => $selected_part_slug
-                        ));
+                      $part = new WP_Query(array(
+                        'post_type' => 'parts',
+                        'name' => $selected_part
+                      ));
+                      //var_dump($part);
 
-                        if($part->have_posts()): while($part->have_posts()): $part->the_post();
-                          if(get_field('picture')): ?>
-                            <tr>
-                              <td>
-                                <table class="product-image" cellpadding="0" cellspacing="0">
-                                  <tr>
-                                    <td><img src="<?php the_field('picture'); ?>" /></td>
-                                  </tr>
-                                  <tr>
-                                    <td class="bg-highlight"><?php the_title(); ?></td>
-                                  </tr>                        
-                                </table>
-                              </td>
-                            </tr>
-                        <?php endif; endwhile; endif; wp_reset_postdata(); 
-                      }
-                    }
-                  ?>
+                      if($part->have_posts()): while($part->have_posts()): $part->the_post();
+                        $part_id = get_the_ID();
+                        if(get_field('picture', $part_id)): ?>
+                          <tr>
+                            <td>
+                              <table class="product-image" cellpadding="0" cellspacing="0">
+                                <tr>
+                                  <td><img src="<?php the_field('picture', $part_id); ?>" /></td>
+                                </tr>
+                                <tr>
+                                  <td class="bg-highlight"><?php the_title(); ?></td>
+                                </tr>                        
+                              </table>
+                            </td>
+                          </tr>
+                    <?php endif; endwhile; wp_reset_postdata(); endif; ?>
+                  <?php endwhile; else: ?>
+                    <tr><td>&nbsp;</td></tr>
+                  <?php endif; ?>
                 </table>
               </td>
             </tr>
