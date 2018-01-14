@@ -57,6 +57,7 @@
   </head>
 
   <body <?php body_class(); ?>>
+    <?php $quote_id = get_the_ID(); ?>
     <table id="bodyTable" cellpadding="0" cellspacing="0">
       <tr>
         <td>
@@ -91,11 +92,11 @@
                   </tr>
                   <tr>
                     <td class="bg-highlight" style="width:60%; font-size:12px; font-weight:bold; padding:0px 2px;">Installation Date</td>
-                    <td class="bg-highlight" style="width:40%; font-size:12px; padding:0px 2px;"><?php the_field('installation_date'); ?></td>
+                    <td class="bg-highlight" style="width:40%; font-size:12px; padding:0px 2px;"><?php the_field('installation_date', $quote_id); ?></td>
                   </tr>
                   <tr>
                     <td class="bg-highlight" style="width:60%; font-size:12px; font-weight:bold; padding:0px 2px;">Start Date</td>
-                    <td class="bg-highlight" style="width:60%; font-size:12px; padding:0px 2px;"><?php the_field('start_date'); ?></td>
+                    <td class="bg-highlight" style="width:60%; font-size:12px; padding:0px 2px;"><?php the_field('start_date', $quote_id); ?></td>
                   </tr>
                   <tr>
                     <td colspan="2" style="border-bottom:none;">&nbsp;</td>
@@ -118,8 +119,8 @@
                         </tr>
                         <tr>
                           <td class="bg-highlight" style="width:33.3%; padding:0px 2px"><?php echo get_the_title() ? get_the_title() : '&nbsp;'; ?></td>
-                          <td class="bg-highlight" style="width:33.3%; padding:0px 2px"><?php echo get_field('street_address') ? get_field('street_address') : '&nbsp;'; ?><br /><?php echo get_field('city_state_zip') ? get_field('city_state_zip') : '&nbsp;'; ?></td>
-                          <td class="bg-highlight" style="width:33.3%; padding:0px 2px"><?php echo get_field('phone') ? get_field('phone') : '&nbsp;'; ?></td>
+                          <td class="bg-highlight" style="width:33.3%; padding:0px 2px"><?php echo get_field('street_address', $quote_id) ? get_field('street_address', $quote_id) : '&nbsp;'; ?><br /><?php echo get_field('city_state_zip', $quote_id) ? get_field('city_state_zip', $quote_id) : '&nbsp;'; ?></td>
+                          <td class="bg-highlight" style="width:33.3%; padding:0px 2px"><?php echo get_field('phone', $quote_id) ? get_field('phone', $quote_id) : '&nbsp;'; ?></td>
                         </tr>
                         <tr>
                           <td style="width:33.3%;">
@@ -140,12 +141,12 @@
                                 <td style="width:100%; font-size:12px; font-weight:bold; text-align:center;">Tenant Name</td>
                               </tr>
                               <tr>
-                                <td style="width:100%; padding:0px 2px"><?php echo get_field('tenant_name') ? get_field('tenant_name') : '&nbsp;'; ?></td>
+                                <td style="width:100%; padding:0px 2px"><?php echo get_field('tenant_name', $quote_id) ? get_field('tenant_name', $quote_id) : '&nbsp;'; ?></td>
                               </tr>
                             </table>
                           </td>
-                          <td style="width:33.3%;"><?php echo get_field('installation_street_address') ? get_field('installation_street_address') : '&nbsp;'; ?><br /><?php echo get_field('installation_city_state_zip') ? get_field('installation_city_state_zip') : '&nbsp;'; ?></td>
-                          <td style="width:33.3%;"><?php echo get_field('email') ? get_field('email') : '&nbsp;'; ?></td>
+                          <td style="width:33.3%;"><?php echo get_field('installation_street_address', $quote_id) ? get_field('installation_street_address', $quote_id) : '&nbsp;'; ?><br /><?php echo get_field('installation_city_state_zip', $quote_id) ? get_field('installation_city_state_zip', $quote_id) : '&nbsp;'; ?></td>
+                          <td style="width:33.3%;"><?php echo get_field('email', $quote_id) ? get_field('email', $quote_id) : '&nbsp;'; ?></td>
                         </tr>
                       </table>
                     </td>
@@ -163,13 +164,14 @@
                         </tr>
                         <!-- installation items loop -->
                         <?php
-                          $items = get_field('item');
+                          $subtotal = 0;
+                          $items = get_field('item', $quote_id);
                           if($items){
                             foreach($items as $item){
                               echo '<tr><td>' . ($item['part'] ? $item['part'] : '&nbsp;') . '</td>';
                               echo '<td>' . ($item['new_existing_na'] ? $item['new_existing_na'] : '&nbsp;') . '</td>';
                               echo '<td>' . ($item['note_description'] ? $item['note_description'] : '&nbsp;') . '</td></tr>';
-                              $item_price = get_sub_field('price');
+                              $item_price = $item['price'];
                               if(is_numeric($item_price)){
                                 $subtotal += $item_price; 
                               }
@@ -184,7 +186,7 @@
                     <td class="bg-highlight" style="font-size:12px; font-weight:bold; text-align:center;">Class B Contractor, Mechanical Tradesman License #2710023723. Contractors License #2705012073.</td>
                   </tr>
                   <tr>
-                    <td style="padding:0px 2px;"><?php echo get_field('project_notes') ? get_field('project_notes') : '&nbsp;'; ?></td>
+                    <td style="padding:0px 2px;"><?php echo get_field('project_notes', $quote_id) ? get_field('project_notes', $quote_id) : '&nbsp;'; ?></td>
                   </tr>
                   <tr>
                     <td class="bg-highlight" style="font-size:12px; font-weight:bold; text-align:center;">With every quality installation when applicable</td>
@@ -201,7 +203,7 @@
                         <tr>
                           <td style="width:75%;">
                             <table id="warranties" cellpadding="0" cellspacing="0" style="width:100%;">
-                              <?php if(have_rows('warranties')): while(have_rows('warranties')) : the_row(); ?>
+                              <?php if(have_rows('warranties', $quote_id)): while(have_rows('warranties', $quote_id)) : the_row(); ?>
                                 <tr>
                                   <td style="width:25%;"><?php echo get_sub_field('warranty_term') ? get_sub_field('warranty_term') : '&nbsp;'; ?></td>
                                   <td style="width:75%;"><?php echo get_sub_field('warranty_details') ? get_sub_field('warranty_details') : '&nbsp;'; ?></td>
@@ -219,7 +221,7 @@
                       <table id="subtotal" cellpadding="0" cellspacing="0" style="width:100%;">
                         <tr>
                           <td style="width:75%; padding:0px 2px; font-size:12px; font-weight:bold;">The above work will be performed for the sum of:</td>
-                          <td style="width:25%; padding:0px 2px;"><?php var_dump($subtotal); //echo $subtotal ? $subtotal : '&nbsp;'; ?></td>
+                          <td style="width:25%; padding:0px 2px;"><?php echo $subtotal ? '$' . number_format($subtotal, 2) : '&nbsp;'; ?></td>
                         </tr>
                       </table>
                     </td>
@@ -230,7 +232,7 @@
                         <?php 
                           $i=0; 
                           $grandtotal = $subtotal;
-                          if(have_rows('options')): while(have_rows('option')): the_row(); ?>
+                          if(have_rows('options', $quote_id)): while(have_rows('option', $quote_id)): the_row(); ?>
                           <tr>
                             <td class="bg-highlight" style="width:75%; padding:0px 2px;"><span style="font-weight:bold;"><?php if($i==0){ echo 'Options: '; } ?><?php echo the_sub_field('option'); ?></span></td>
                             <td style="width:25%;"><?php the_sub_field('option_price'); ?></td>
@@ -249,7 +251,7 @@
                       <table id="grandTotal" cellpadding="0" cellspacing="0" style="width:100%;">
                         <tr>
                           <td style="width:75%; text-align:center; font-size:12px; font-weight:bold;">Total Investment</td>
-                          <td style="width:25%; padding:0px 2px;"><?php echo $grandtotal ? $grandtotal : '&nbsp;'; ?></td>
+                          <td style="width:25%; padding:0px 2px;"><?php echo $grandtotal ? '$' . number_format($grandtotal,2) : '&nbsp;'; ?></td>
                         </tr>
                       </table>
                     </td>
@@ -259,13 +261,13 @@
                       <table id="terms" cellpadding="0" cellspacing="0" style="width:100%;">
                         <tr>
                           <td style="width:15%; font-size:12px; font-weight:bold; padding:0px 2px;">Terms:</td>
-                          <td class="bg-highlight" style="width:85%; padding:0px 2px;"><?php the_field('payment_terms'); ?></td>
+                          <td class="bg-highlight" style="width:85%; padding:0px 2px;"><?php the_field('payment_terms', $quote_id); ?></td>
                         </tr>
                       </table>
                     </td>
                   </tr>
                   <tr>
-                    <td class="bg-highlight" style="width:100%; padding:0px 2px;"><span style="font-weight:bold;">Install Notes: <?php the_field('installation_notes'); ?></span></td>
+                    <td class="bg-highlight" style="width:100%; padding:0px 2px;"><span style="font-weight:bold;">Install Notes: <?php the_field('installation_notes', $quote_id); ?></span></td>
                   </tr>
                   <tr>
                     <td>
@@ -287,32 +289,36 @@
               </td>
               <td id="sidebar" style="width:25%;">
                 <table id="productImages" cellpadding="0" cellspacing="0" style="width:100%;">
-                  <?php if(have_rows('items')): while(have_rows('items')): the_row(); ?>
-                    <?php 
-                      $selected_part = get_sub_field('parts');
-                      $selected_part_slug = $part['value'];
+                  <?php 
+                    $items = get_field('item', $quote_id);
+                    if($items){
+                      foreach($items as $item){
+                        $selected_part = $item['part'];
+                        $selected_part_slug = $selected_part['value'];
 
-                      $part = new WP_Query(array(
-                        'post_type' => 'parts',
-                        'pagename' => $selected_part_slug
-                      ));
+                        $part = new WP_Query(array(
+                          'post_type' => 'parts',
+                          'pagename' => $selected_part_slug
+                        ));
 
-                      if($part->have_posts()): while($part->have_posts()): $part->the_post();
-                        if(get_field('picture')): ?>
-                          <tr>
-                            <td>
-                              <table class="product-image" cellpadding="0" cellspacing="0">
-                                <tr>
-                                  <td><img src="<?php the_field('picture'); ?>" /></td>
-                                </tr>
-                                <tr>
-                                  <td class="bg-highlight"><?php the_title(); ?></td>
-                                </tr>                        
-                              </table>
-                            </td>
-                          </tr>
-                    <?php endif; endwhile; endif; wp_reset_postdata(); ?> ?>
-                  <?php endwhile; endif; ?>
+                        if($part->have_posts()): while($part->have_posts()): $part->the_post();
+                          if(get_field('picture')): ?>
+                            <tr>
+                              <td>
+                                <table class="product-image" cellpadding="0" cellspacing="0">
+                                  <tr>
+                                    <td><img src="<?php the_field('picture'); ?>" /></td>
+                                  </tr>
+                                  <tr>
+                                    <td class="bg-highlight"><?php the_title(); ?></td>
+                                  </tr>                        
+                                </table>
+                              </td>
+                            </tr>
+                        <?php endif; endwhile; endif; wp_reset_postdata(); 
+                      }
+                    }
+                  ?>
                 </table>
               </td>
             </tr>
