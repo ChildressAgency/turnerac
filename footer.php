@@ -24,17 +24,23 @@
         </div>
       </div>
     <?php endif; ?>
-      <div id="commercial" style="background-image:url(<?php the_field('commercial_section_image', 'option'); ?>); <?php the_field('commercial_section_image_css', 'option'); ?>">
+      <div id="commercial" style="background-image:url(<?php echo get_field('commercial_section_image') ? get_field('commercial_section_image') : get_field('commercial_section_image', 'option'); ?>); <?php echo get_field('commercial_section_image') ? get_field('commercial_section_image_css') : get_field('commercial_section_image_css', 'option'); ?>">
         <div class="container">
           <div class="caption-wrap">
             <div class="caption">
-              <h1 class="wow slideInLeft"><?php the_field('commercial_section_header', 'option'); ?></h1>
-              <h4 class="wow slideInLeft"><?php the_field('commercial_section_subheader', 'option'); ?></h4>
+              <h1 class="wow slideInLeft"><?php echo get_field('commercial_section_header') ? get_field('commercial_section_header') : get_field('commercial_section_header', 'option'); ?></h1>
+              <h4 class="wow slideInLeft"><?php echo get_field('commercial_section_header') ? get_field('commercial_section_subheader') : get_field('commercial_section_subheader', 'option'); ?></h4>
               <hr class="section-title-divider" />
-              <?php the_field('commercial_section_text', 'option'); ?>
-              <p class="btn-pill btn-white">
-                <a href="<?php the_field('commercial_section_link', 'option'); ?>"><?php the_field('commercial_section_link_text', 'option'); ?></a>
-              </p>
+              <?php echo get_field('commercial_section_header') ? get_field('commercial_section_text') : get_field('commercial_section_text', 'option'); ?>
+              <?php if(get_field('commercial_section_header') && get_field('commercial_section_link')): ?>
+                <p class="btn-pill btn-white">
+                  <a href="<?php the_field('commercial_section_link'); ?>"><?php the_field('commercial_section_link_text'); ?></a>
+                </p>
+              <?php elseif(get_field('commercial_section_link', 'option') && !get_field('commercial_section_header')): ?>
+                <p class="btn-pill btn-white">
+                  <a href="<?php the_field('commercial_section_link', 'option'); ?>"><?php the_field('commercial_section_link_text', 'option'); ?></a>
+                </p>
+              <?php endif; ?>
             </div>
           </div>
         </div>
