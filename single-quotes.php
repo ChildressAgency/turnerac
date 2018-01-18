@@ -251,7 +251,7 @@
                         <?php 
                           $i=0; 
                           $grandtotal = $subtotal;
-                          if(have_rows('options', $quote_id)): while(have_rows('option', $quote_id)): the_row(); ?>
+                          if(have_rows('options', $quote_id)): while(have_rows('options', $quote_id)): the_row(); ?>
                           <tr>
                             <td class="bg-highlight" style="width:75%; padding:0px 2px;"><span style="font-weight:bold;"><?php if($i==0){ echo 'Options: '; } ?><?php echo the_sub_field('option'); ?></span></td>
                             <td style="width:25%;"><?php the_sub_field('option_price'); ?></td>
