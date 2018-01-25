@@ -1,3 +1,4 @@
+<?php acf_form_head(); ?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -52,6 +53,31 @@
       }
       .product-img{
         width:100%;
+      }
+      .acf-field .acf-label{
+        vertical-align:middle;
+      }
+      .acf-form-submit{
+        text-align:center;
+        padding:10px;
+      }
+      .m-signature-pad{
+        margin-bottom:15px;
+        height:120px;
+      }
+      .m-signature-pad--body canvas{
+        height:100px;
+        margin:0px auto 10px;
+      }
+
+      @media print{
+        .acf-form-submit,
+        .m-signature-pad--footer{
+          display:none !important;
+        }
+        .signature-pad{
+          margin-bottom:0;
+        }
       }
     </style>
   </head>
@@ -289,20 +315,26 @@
                     <td class="bg-highlight" style="width:100%; padding:0px 2px;"><span style="font-weight:bold;">Install Notes: <?php the_field('installation_notes', $quote_id); ?></span></td>
                   </tr>
                   <tr>
+                    <td colspan="2" style="text-align:center; font-size:12px;">The quoted prices are good for 30 days and may change after that time.</td>
+                  </tr>  
+                  <tr>
                     <td>
-                      <table id="signature" cellpadding="0" cellspacing="0" style="width:100%;">
-                        <tr>
-                          <td colspan="2" style="text-align:center; font-size:12px;">The quoted prices are good for 30 days and may change after that time.</td>
-                        </tr>  
-                        <tr>
-                          <td style="width:75%; padding:7px 2px; font-weight:bold;">Accepted (Client)</td>
-                          <td style="width:25%; padding:7px 2px; font-weight:bold;">Date</td>
-                        </tr>
-                        <tr>
-                          <td colspan="2" style="text-align:center; font-size:12px;">&copy;Turner Air Conditioning (All Rights Reserved)</td>
-                        </tr>
-                      </table>
+                      <?php 
+                        $sig_form = array(
+                          'fields' => array('field_5a69f52e157be', 'field_5a69fc2e6f583'),
+                          'updated_message' => false,
+                          'field_el' => 'tr',
+                          'post_id' => $quote_id,
+                          'html_before_fields' => '<table id="signature" cellpadding="0" cellspacing="0" style="width:100%;">',
+                          'html_after_fields' => '</table>',
+                          'submit_value' => 'Save Signature'
+                        );
+                        acf_form($sig_form);
+                      ?>
                     </td>
+                  </tr>
+                  <tr>
+                    <td colspan="2" style="text-align:center; font-size:12px;">&copy;Turner Air Conditioning (All Rights Reserved)</td>
                   </tr>
                 </table>
               </td>
